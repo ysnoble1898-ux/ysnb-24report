@@ -224,7 +224,16 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
 .mi.dc    .mv{color:#BF360C;}
 .mi.xfer  .mv{color:var(--Nb);}
 
-/* 보고사항 뷰 (요청 2+4) */
+/* 관리자 뷰 입퇴원 행 */
+.adm-mvrow{display:flex;align-items:stretch;border-top:1px solid var(--bdr);}
+.adm-mvleft{display:flex;align-items:center;gap:8px;padding:10px 14px;
+  width:130px;flex-shrink:0;border-right:1px solid var(--bdr);background:#fafbfc;}
+.adm-mvcnt{font-size:14px;font-weight:700;color:var(--navy);}
+.adm-mvright{flex:1;padding:8px 13px;background:#FFFDE7;
+  border-left:3px solid #F9A825;display:flex;flex-direction:column;gap:3px;}
+.adm-mvmemo{font-size:13px;color:var(--txt);white-space:pre-wrap;line-height:1.6;}
+
+/* 보고사항 뷰 */
 .memo-section{background:#FFFDE7;border:2px solid #F9A825;border-radius:var(--r);padding:14px 18px;}
 .memo-section .memo-title{font-size:16px;font-weight:800;color:#E65100;margin-bottom:10px;
   display:flex;align-items:center;gap:6px;}
@@ -790,28 +799,30 @@ async function loadAdmin(){
           <div style="padding:22px;text-align:center;color:var(--muted);font-size:14px;">
             보고서가 아직 작성되지 않았습니다.</div>`;
       } else {
-        /* 요청 1 — 담당의 제거, 요청 2 — 글자 크게 */
+        /* 관리자 뷰 — D/E/N 시간 없이 dot만 */
         const shHtml=['D','E','N'].map(s=>{
           const sh=r.shifts?.[s]||{};
           return `
           <div class="sc">
-            <div class="sn"><span class="dot d${s}">${s}</span>
-              <span style="font-size:12px;font-weight:700;color:var(--muted);">
-                ${s==='D'?'07-15':s==='E'?'15-23':'23-07'}</span></div>
+            <div class="sn"><span class="dot d${s}">${s}</span></div>
             <div class="si"><b>근무자:</b> ${sh.staff||'—'}</div>
             <div class="si"><b>재원:</b> ${sh.cnt||'—'}명</div>
             ${sh.memo?`<div class="sm">${esc(sh.memo)}</div>`:''}
           </div>`;
         }).join('');
 
-        /* 요청 4 — 보고사항 강조 */
-        const memoHtml=r.memo?`
-          <div class="wcs">
-            <div class="memo-section">
-              <div class="memo-title">📌 보고사항</div>
-              <div class="mbox">${esc(r.memo)}</div>
+        /* 입퇴원 — 이미지대로 왼쪽 배지+수치 / 오른쪽 보고사항 */
+        const mvRowHtml = (badge, cls, cnt, memo) => `
+          <div class="adm-mvrow">
+            <div class="adm-mvleft">
+              <div class="mv-badge ${cls}">${badge}</div>
+              <span class="adm-mvcnt">${cnt||0}명</span>
             </div>
-          </div>`:'';
+            <div class="adm-mvright">
+              <div class="mv-rpt-title">📌 보고사항</div>
+              <div class="adm-mvmemo">${memo ? esc(memo) : '<span style="color:#ccc">—</span>'}</div>
+            </div>
+          </div>`;
 
         div.innerHTML=`
           <div class="wchd">
@@ -825,33 +836,12 @@ async function loadAdmin(){
             <div class="wclbl">근무자 현황</div>
             <div class="sr">${shHtml}</div>
           </div>
-          <div class="wcs">
-            <div class="wclbl">입·퇴원·전실</div>
-            <div style="display:flex;flex-direction:column;gap:8px;">
-              <div style="display:flex;align-items:flex-start;gap:10px;">
-                <div class="mv-badge mv-badge-admit" style="width:36px;height:36px;font-size:12px;flex-shrink:0;">입원</div>
-                <div style="flex:1;">
-                  <div style="font-size:13px;font-weight:700;color:#1565C0;">${r.admit||0}명</div>
-                  ${r.admitMemo?`<div style="font-size:12px;color:var(--muted);margin-top:2px;white-space:pre-wrap;">${esc(r.admitMemo)}</div>`:''}
-                </div>
-              </div>
-              <div style="display:flex;align-items:flex-start;gap:10px;">
-                <div class="mv-badge mv-badge-dc" style="width:36px;height:36px;font-size:12px;flex-shrink:0;">퇴원</div>
-                <div style="flex:1;">
-                  <div style="font-size:13px;font-weight:700;color:#BF360C;">${r.dc||0}명</div>
-                  ${r.dcMemo?`<div style="font-size:12px;color:var(--muted);margin-top:2px;white-space:pre-wrap;">${esc(r.dcMemo)}</div>`:''}
-                </div>
-              </div>
-              <div style="display:flex;align-items:flex-start;gap:10px;">
-                <div class="mv-badge mv-badge-xfer" style="width:36px;height:36px;font-size:12px;flex-shrink:0;">전실</div>
-                <div style="flex:1;">
-                  <div style="font-size:13px;font-weight:700;color:#4527A0;">${r.xfer||0}명</div>
-                  ${r.xferMemo?`<div style="font-size:12px;color:var(--muted);margin-top:2px;white-space:pre-wrap;">${esc(r.xferMemo)}</div>`:''}
-                </div>
-              </div>
-            </div>
-          </div>
-          ${memoHtml}`;
+          <div class="wcs" style="padding:0;">
+            <div class="wclbl" style="padding:10px 17px 6px;">입·퇴원·전실</div>
+            ${mvRowHtml('입원','mv-badge-admit',r.admit,r.admitMemo)}
+            ${mvRowHtml('퇴원','mv-badge-dc',   r.dc,   r.dcMemo)}
+            ${mvRowHtml('전실','mv-badge-xfer',  r.xfer, r.xferMemo)}
+          </div>`;
       }
       con.appendChild(div);
     });

@@ -122,14 +122,38 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
 .sw{border:1.5px solid var(--bdr);border-radius:var(--r);margin-bottom:13px;overflow:hidden;}
 .shd{padding:11px 15px;display:flex;align-items:center;gap:9px;font-weight:700;font-size:14px;}
 .shd.D{background:var(--D);color:var(--Db);}
+.shd.M{background:#E8F5E9;color:#2E7D32;}
 .shd.E{background:var(--E);color:var(--Eb);}
 .shd.N{background:var(--N);color:var(--Nb);}
 .sbd{padding:15px;}
 .dot{display:inline-flex;align-items:center;justify-content:center;
   width:28px;height:28px;border-radius:50%;font-size:13px;font-weight:700;}
 .dD{background:#BBDEFB;color:var(--Db);}
+.dM{background:#C8E6C9;color:#2E7D32;}
 .dE{background:#FFE0B2;color:var(--Eb);}
 .dN{background:#D1C4E9;color:var(--Nb);}
+
+/* 기타 특이사항 카드 */
+.card-etc{background:var(--sur);border-radius:var(--r);
+  box-shadow:var(--sh);margin-bottom:16px;overflow:hidden;
+  border-left:4px solid var(--navy2);}
+.card-etc .chd{padding:12px 17px;border-bottom:1px solid var(--bdr);}
+.card-etc .chd h2{font-size:14px;font-weight:700;color:var(--navy2);}
+.card-etc .cbd{padding:17px;}
+.card-etc textarea{font-size:13px;min-height:90px;}
+
+/* 퇴원 구분 체크 */
+.dc-type{display:flex;align-items:center;gap:16px;margin-bottom:10px;flex-wrap:wrap;}
+.dc-type label{display:flex;align-items:center;gap:6px;font-size:13px;
+  font-weight:600;cursor:pointer;color:var(--txt);}
+.dc-type input[type=radio]{width:16px;height:16px;accent-color:var(--teal);cursor:pointer;}
+.mv-badge-death{background:#F3E5F5;color:#6A1B9A;border:2px solid #6A1B9A;}
+
+/* 퇴원 행 분리 */
+.dc-sub-row{display:flex;align-items:stretch;border-top:1px dashed var(--bdr);}
+.dc-sub-row .mvleft{background:#fdf6ff;}
+.dc-sub-badge{display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border-radius:6px;font-size:12px;font-weight:800;flex-shrink:0;}
 
 /* GRID */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
@@ -405,16 +429,31 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
             </div>
           </div>
 
-          <!-- 퇴원 행 -->
-          <div class="mvrow">
-            <div class="mvleft">
-              <div class="mv-badge mv-badge-dc">퇴원</div>
-              <input type="number" id="mv-dc" min="0" placeholder="0" class="mv-num">
-              <span class="mv-unit">명</span>
+          <!-- 퇴원 행 — 일반퇴원 / 사망 구분 -->
+          <div class="mvrow" style="flex-direction:column;padding:0;">
+            <!-- 일반 퇴원 -->
+            <div style="display:flex;align-items:stretch;border-bottom:1px dashed var(--bdr);">
+              <div class="mvleft">
+                <div class="mv-badge mv-badge-dc">퇴원</div>
+                <input type="number" id="mv-dc" min="0" placeholder="0" class="mv-num">
+                <span class="mv-unit">명</span>
+              </div>
+              <div class="mvright">
+                <div class="mv-rpt-title">📌 보고사항</div>
+                <textarea id="mv-dc-memo" placeholder="퇴원 관련 내용을 입력하세요"></textarea>
+              </div>
             </div>
-            <div class="mvright">
-              <div class="mv-rpt-title">📌 보고사항</div>
-              <textarea id="mv-dc-memo" placeholder="퇴원 관련 내용을 입력하세요"></textarea>
+            <!-- 사망 -->
+            <div style="display:flex;align-items:stretch;">
+              <div class="mvleft" style="background:#fdf6ff;">
+                <div class="mv-badge mv-badge-death">사망</div>
+                <input type="number" id="mv-death" min="0" placeholder="0" class="mv-num">
+                <span class="mv-unit">명</span>
+              </div>
+              <div class="mvright" style="background:#fdf6ff;">
+                <div class="mv-rpt-title">📌 보고사항</div>
+                <textarea id="mv-death-memo" placeholder="사망 관련 내용을 입력하세요"></textarea>
+              </div>
             </div>
           </div>
 
@@ -433,6 +472,17 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
 
         </div>
       </div>
+
+      <!-- 기타 특이사항 -->
+      <div class="card-etc">
+        <div class="chd"><h2>📝 기타 특이사항</h2></div>
+        <div class="cbd">
+          <div class="fld">
+            <textarea id="etc-memo"
+              placeholder="낙상, 욕창, 이상반응, 환자상태 변화, 보호자 민원 등 기타 특이사항을 기록하세요."></textarea>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- 일별 현황 (관리자) -->
@@ -444,15 +494,19 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
         <button class="btn btn-teal" onclick="loadAdmin()">🔍 조회</button>
         <button class="btn btn-ghost" onclick="window.print()">🖨 출력</button>
       </div>
-      <!-- 통계 4개 (요청 3 — 입원/퇴원/총원 강조) -->
-      <div class="stats">
+      <!-- 통계 5개 — 입원/퇴원/사망/총원/전실 -->
+      <div class="stats" style="grid-template-columns:repeat(5,1fr);">
         <div class="stat stat-admit">
           <div class="n" id="st-admit">—</div>
           <div class="l">🏥 전체 입원</div>
         </div>
         <div class="stat stat-dc">
           <div class="n" id="st-dc">—</div>
-          <div class="l">🚪 전체 퇴원</div>
+          <div class="l">🚪 일반 퇴원</div>
+        </div>
+        <div class="stat" style="border-left-color:#6A1B9A;background:linear-gradient(135deg,#F3E5F5,#fff);">
+          <div class="n" id="st-death" style="color:#6A1B9A;">—</div>
+          <div class="l">🕊 사망</div>
         </div>
         <div class="stat stat-total">
           <div class="n" id="st-total">—</div>
@@ -505,8 +559,8 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
           <table class="tbl">
             <thead><tr>
               <th>일자</th><th>병동</th><th>작성자</th>
-              <th>D 근무자</th><th>E 근무자</th><th>N 근무자</th>
-              <th>입원</th><th>퇴원</th><th>이실</th><th>상세</th>
+              <th>D</th><th>M</th><th>E</th><th>N</th>
+              <th>입원</th><th>퇴원</th><th>사망</th><th>이실</th><th>상세</th>
             </tr></thead>
             <tbody id="hist-tbody"></tbody>
           </table>
@@ -712,10 +766,10 @@ function showPage(id){
   g(id)?.classList.add('on');
 }
 
-/* SHIFT FORMS — 담당의 제거 (요청 1) */
+/* SHIFT FORMS — D/M/E/N, 인계특이사항 제거, N만 재원 */
 function buildShiftForms(){
   const c=g('shift-forms'); c.innerHTML='';
-  ['D','E','N'].forEach(s=>{
+  ['D','M','E','N'].forEach(s=>{
     const cntField = s==='N' ? `
         <div class="fld" style="width:160px;">
           <label>재원 환자 수 (명)</label>
@@ -732,11 +786,6 @@ function buildShiftForms(){
           </div>
           ${cntField}
         </div>
-        <div class="stitle">인계 / 특이사항</div>
-        <div class="fld">
-          <textarea id="sh-${s}-memo"
-            placeholder="낙상, 욕창, 처치내용, 인계사항 등을 기록하세요."></textarea>
-        </div>
       </div>
     </div>`;
   });
@@ -747,11 +796,10 @@ async function saveReport(){
   const dt=g('wr-date').value;
   if(!dt){toast('날짜를 선택하세요.','err');return;}
   const shifts={};
-  ['D','E','N'].forEach(s=>{
+  ['D','M','E','N'].forEach(s=>{
     shifts[s]={
       staff:v(`sh-${s}-staff`),
       cnt:  v(`sh-${s}-cnt`)||'0',
-      memo: v(`sh-${s}-memo`),
     };
   });
   const data={
@@ -759,10 +807,13 @@ async function saveReport(){
     shifts,
     admit:      v('mv-admit')||'0',
     dc:         v('mv-dc')||'0',
+    death:      v('mv-death')||'0',
     xfer:       v('mv-xfer')||'0',
     admitMemo:  v('mv-admit-memo'),
     dcMemo:     v('mv-dc-memo'),
+    deathMemo:  v('mv-death-memo'),
     xferMemo:   v('mv-xfer-memo'),
+    etcMemo:    v('etc-memo'),
     updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
   };
   try{
@@ -778,20 +829,23 @@ async function loadReport(){
     const snap=await db.collection('reports').doc(`${CU.ward}_${dt}`).get();
     if(!snap.exists){toast('해당 날짜 보고서가 없습니다.');return;}
     const d=snap.data();
-    ['D','E','N'].forEach(s=>{
+    ['D','M','E','N'].forEach(s=>{
       sv(`sh-${s}-staff`,d.shifts?.[s]?.staff);
       sv(`sh-${s}-cnt`,  d.shifts?.[s]?.cnt);
-      sv(`sh-${s}-memo`, d.shifts?.[s]?.memo);
     });
-    sv('mv-admit',d.admit); sv('mv-dc',d.dc); sv('mv-xfer',d.xfer);
-    sv('mv-admit-memo',d.admitMemo); sv('mv-dc-memo',d.dcMemo); sv('mv-xfer-memo',d.xferMemo);
+    sv('mv-admit',d.admit); sv('mv-dc',d.dc);
+    sv('mv-death',d.death); sv('mv-xfer',d.xfer);
+    sv('mv-admit-memo',d.admitMemo); sv('mv-dc-memo',d.dcMemo);
+    sv('mv-death-memo',d.deathMemo); sv('mv-xfer-memo',d.xferMemo);
+    sv('etc-memo',d.etcMemo);
     toast('불러왔습니다.','ok');
   }catch(e){toast('불러오기 실패: '+e.message,'err');}
 }
 
 function clearForm(){
-  ['D','E','N'].forEach(s=>['staff','cnt','memo'].forEach(f=>sv(`sh-${s}-${f}`,'')));
-  ['mv-admit','mv-dc','mv-xfer','mv-admit-memo','mv-dc-memo','mv-xfer-memo'].forEach(id=>sv(id,''));
+  ['D','M','E','N'].forEach(s=>['staff','cnt'].forEach(f=>sv(`sh-${s}-${f}`,'')));
+  ['mv-admit','mv-dc','mv-death','mv-xfer',
+   'mv-admit-memo','mv-dc-memo','mv-death-memo','mv-xfer-memo','etc-memo'].forEach(id=>sv(id,''));
 }
 
 /* ADMIN VIEW */
@@ -804,21 +858,21 @@ async function loadAdmin(){
     const rmap={};
     snap.forEach(d=>{rmap[d.data().ward]=d.data();});
 
-    let totAdmit=0,totDc=0,totTotal=0,totXfer=0;
+    let totAdmit=0,totDc=0,totDeath=0,totTotal=0,totXfer=0;
     WARDS.forEach(w=>{
       const r=rmap[w];
       if(r){
-        /* 총원 = N번 재원 (마지막 근무 기준) or 최대값 */
-        const mx=Math.max(...['D','E','N'].map(s=>parseInt(r.shifts?.[s]?.cnt||0)));
-        totTotal += mx;
+        const nCnt=parseInt(r.shifts?.N?.cnt||0);
+        totTotal += nCnt;
         totAdmit += parseInt(r.admit||0);
         totDc    += parseInt(r.dc||0);
+        totDeath += parseInt(r.death||0);
         totXfer  += parseInt(r.xfer||0);
       }
     });
-    /* 요청 3 — 입원/퇴원/총원 표시 */
     g('st-admit').textContent = totAdmit || '0';
     g('st-dc').textContent    = totDc    || '0';
+    g('st-death').textContent = totDeath || '0';
     g('st-total').textContent = totTotal || '0';
     g('st-xfer').textContent  = totXfer  || '0';
 
@@ -833,8 +887,8 @@ async function loadAdmin(){
           <div style="padding:22px;text-align:center;color:var(--muted);font-size:14px;">
             보고서가 아직 작성되지 않았습니다.</div>`;
       } else {
-        /* 관리자 뷰 — D/E/N dot만, N번만 재원 표시 */
-        const shHtml=['D','E','N'].map(s=>{
+        /* D/M/E/N 근무자, N만 재원 표시 */
+        const shHtml=['D','M','E','N'].map(s=>{
           const sh=r.shifts?.[s]||{};
           const cntHtml = s==='N'
             ? `<div class="si"><b>재원:</b> ${sh.cnt||'—'}명</div>` : '';
@@ -843,22 +897,28 @@ async function loadAdmin(){
             <div class="sn"><span class="dot d${s}">${s}</span></div>
             <div class="si"><b>근무자:</b> ${sh.staff||'—'}</div>
             ${cntHtml}
-            ${sh.memo?`<div class="sm">${esc(sh.memo)}</div>`:''}
           </div>`;
         }).join('');
 
-        /* 입퇴원 — 이미지대로 왼쪽 배지+수치 / 오른쪽 보고사항 */
-        const mvRowHtml = (badge, cls, cnt, memo) => `
-          <div class="adm-mvrow">
-            <div class="adm-mvleft">
-              <div class="mv-badge ${cls}">${badge}</div>
+        /* 입퇴원 행 헬퍼 */
+        const mvRow=(badge,cls,cnt,memo,bg='')=>`
+          <div class="adm-mvrow" style="${bg?'background:'+bg:''}">
+            <div class="adm-mvleft" style="${bg?'background:'+bg:''}">
+              <div class="mv-badge ${cls}" style="width:36px;height:36px;font-size:12px;">${badge}</div>
               <span class="adm-mvcnt">${cnt||0}명</span>
             </div>
-            <div class="adm-mvright">
+            <div class="adm-mvright" style="${bg?'background:'+bg:''}">
               <div class="mv-rpt-title">📌 보고사항</div>
-              <div class="adm-mvmemo">${memo ? esc(memo) : '<span style="color:#ccc">—</span>'}</div>
+              <div class="adm-mvmemo">${memo?esc(memo):'<span style="color:#ccc">—</span>'}</div>
             </div>
           </div>`;
+
+        /* 기타 특이사항 */
+        const etcHtml=r.etcMemo?`
+          <div class="wcs">
+            <div class="wclbl">기타 특이사항</div>
+            <div style="font-size:13px;white-space:pre-wrap;line-height:1.7;color:var(--txt);">${esc(r.etcMemo)}</div>
+          </div>`:'';
 
         div.innerHTML=`
           <div class="wchd">
@@ -874,10 +934,12 @@ async function loadAdmin(){
           </div>
           <div class="wcs" style="padding:0;">
             <div class="wclbl" style="padding:10px 17px 6px;">입·퇴원·전실</div>
-            ${mvRowHtml('입원','mv-badge-admit',r.admit,r.admitMemo)}
-            ${mvRowHtml('퇴원','mv-badge-dc',   r.dc,   r.dcMemo)}
-            ${mvRowHtml('전실','mv-badge-xfer',  r.xfer, r.xferMemo)}
-          </div>`;
+            ${mvRow('입원','mv-badge-admit',r.admit,r.admitMemo)}
+            ${mvRow('퇴원','mv-badge-dc',   r.dc,   r.dcMemo)}
+            ${mvRow('사망','mv-badge-death', r.death,r.deathMemo,'#fdf6ff')}
+            ${mvRow('전실','mv-badge-xfer',  r.xfer, r.xferMemo)}
+          </div>
+          ${etcHtml}`;
       }
       con.appendChild(div);
     });
@@ -983,10 +1045,12 @@ async function loadHist(){
       tr.innerHTML=`
         <td>${r.date}</td><td>${r.ward}</td><td>${r.writer}</td>
         <td>${r.shifts?.D?.staff||'—'}</td>
+        <td>${r.shifts?.M?.staff||'—'}</td>
         <td>${r.shifts?.E?.staff||'—'}</td>
         <td>${r.shifts?.N?.staff||'—'}</td>
         <td><b style="color:#1565C0">${r.admit||0}</b></td>
         <td><b style="color:#BF360C">${r.dc||0}</b></td>
+        <td><b style="color:#6A1B9A">${r.death||0}</b></td>
         <td>${r.xfer||0}</td>
         <td><button class="btn btn-ghost btn-xs" data-r="${enc}"
           onclick="showDetail(this)">상세</button></td>`;
@@ -1002,42 +1066,47 @@ async function loadHist(){
 function showDetail(btn){
   const r=JSON.parse(decodeURIComponent(btn.dataset.r));
   g('dm-title').textContent=`${r.ward} — ${r.date} 보고서`;
-  const shHtml=['D','E','N'].map(s=>{
+  const shHtml=['D','M','E','N'].map(s=>{
     const sh=r.shifts?.[s]||{};
-    const bg=s==='D'?'var(--D)':s==='E'?'var(--E)':'var(--N)';
-    const col=s==='D'?'var(--Db)':s==='E'?'var(--Eb)':'var(--Nb)';
+    const bg=s==='D'?'var(--D)':s==='M'?'#E8F5E9':s==='E'?'var(--E)':'var(--N)';
+    const col=s==='D'?'var(--Db)':s==='M'?'#2E7D32':s==='E'?'var(--Eb)':'var(--Nb)';
+    const cntHtml=s==='N'?` &nbsp; <b>재원:</b> ${sh.cnt||0}명`:'';
     return `
-    <div style="margin-bottom:9px;padding:12px;border-radius:6px;background:${bg};color:${col};">
+    <div style="margin-bottom:7px;padding:10px;border-radius:6px;background:${bg};color:${col};">
       <span class="dot d${s}" style="margin-right:6px;">${s}</span>
-      <b>근무자:</b> ${sh.staff||'—'} &nbsp; <b>재원:</b> ${sh.cnt||0}명
-      ${sh.memo?`<div style="font-size:13px;margin-top:6px;white-space:pre-wrap;">${esc(sh.memo)}</div>`:''}
+      <b>근무자:</b> ${sh.staff||'—'}${cntHtml}
     </div>`;
   }).join('');
   g('dm-body').innerHTML=`
     ${shHtml}
-    <div style="padding:12px;background:#f5f7fa;border-radius:6px;margin-top:6px;">
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <div style="display:flex;align-items:flex-start;gap:10px;">
-          <div class="mv-badge mv-badge-admit" style="width:36px;height:36px;font-size:12px;flex-shrink:0;">입원</div>
-          <div><div style="font-weight:700;color:#1565C0;">${r.admit||0}명</div>
+    <div style="padding:11px;background:#f5f7fa;border-radius:6px;margin-top:6px;">
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <span class="mv-badge mv-badge-admit" style="width:34px;height:34px;font-size:11px;flex-shrink:0;">입원</span>
+          <div><b style="color:#1565C0">${r.admit||0}명</b>
             ${r.admitMemo?`<div style="font-size:12px;color:var(--muted);white-space:pre-wrap;">${esc(r.admitMemo)}</div>`:''}</div>
         </div>
-        <div style="display:flex;align-items:flex-start;gap:10px;">
-          <div class="mv-badge mv-badge-dc" style="width:36px;height:36px;font-size:12px;flex-shrink:0;">퇴원</div>
-          <div><div style="font-weight:700;color:#BF360C;">${r.dc||0}명</div>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <span class="mv-badge mv-badge-dc" style="width:34px;height:34px;font-size:11px;flex-shrink:0;">퇴원</span>
+          <div><b style="color:#BF360C">${r.dc||0}명</b>
             ${r.dcMemo?`<div style="font-size:12px;color:var(--muted);white-space:pre-wrap;">${esc(r.dcMemo)}</div>`:''}</div>
         </div>
-        <div style="display:flex;align-items:flex-start;gap:10px;">
-          <div class="mv-badge mv-badge-xfer" style="width:36px;height:36px;font-size:12px;flex-shrink:0;">전실</div>
-          <div><div style="font-weight:700;color:#4527A0;">${r.xfer||0}명</div>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <span class="mv-badge mv-badge-death" style="width:34px;height:34px;font-size:11px;flex-shrink:0;">사망</span>
+          <div><b style="color:#6A1B9A">${r.death||0}명</b>
+            ${r.deathMemo?`<div style="font-size:12px;color:var(--muted);white-space:pre-wrap;">${esc(r.deathMemo)}</div>`:''}</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <span class="mv-badge mv-badge-xfer" style="width:34px;height:34px;font-size:11px;flex-shrink:0;">전실</span>
+          <div><b style="color:#4527A0">${r.xfer||0}명</b>
             ${r.xferMemo?`<div style="font-size:12px;color:var(--muted);white-space:pre-wrap;">${esc(r.xferMemo)}</div>`:''}</div>
         </div>
       </div>
     </div>
-    ${r.memo?`
-    <div style="margin-top:10px;background:#FFFDE7;border:2px solid #F9A825;border-radius:8px;padding:13px;">
-      <div style="font-size:15px;font-weight:800;color:#E65100;margin-bottom:8px;">📌 보고사항</div>
-      <div style="font-size:14px;white-space:pre-wrap;line-height:1.8;">${esc(r.memo)}</div>
+    ${r.etcMemo?`
+    <div style="margin-top:9px;padding:11px;background:var(--bg);border-radius:6px;border-left:3px solid var(--navy2);">
+      <div style="font-size:11px;font-weight:700;color:var(--navy2);margin-bottom:5px;">📝 기타 특이사항</div>
+      <div style="font-size:13px;white-space:pre-wrap;line-height:1.7;">${esc(r.etcMemo)}</div>
     </div>`:''}`;
   om('detail-modal');
 }

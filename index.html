@@ -404,86 +404,91 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
     <!-- 보고서 작성 (담당자) -->
     <div class="page" id="pg-write">
       <div id="wbar"></div>
-      <div class="tbar">
-        <label>📅 보고일자</label>
-        <input type="date" id="wr-date">
-        <button class="btn btn-ghost" onclick="loadReport()">📂 불러오기</button>
-        <button class="btn btn-gold"  onclick="saveReport()">💾 저장</button>
-        <button class="btn btn-ghost" onclick="window.print()">🖨 출력</button>
-      </div>
-      <div id="shift-forms"></div>
-      <div class="card">
-        <div class="chd"><h2>📋 입·퇴원·전실(이실) 현황</h2></div>
-        <div class="cbd" style="padding:0;">
 
-          <!-- 입원 행 -->
-          <div class="mvrow">
-            <div class="mvleft">
-              <div class="mv-badge mv-badge-admit">입원</div>
-              <input type="number" id="mv-admit" min="0" placeholder="0" class="mv-num">
-              <span class="mv-unit">명</span>
-            </div>
-            <div class="mvright">
-              <div class="mv-rpt-title">📌 보고사항</div>
-              <textarea id="mv-admit-memo" placeholder="입원 관련 내용을 입력하세요"></textarea>
-            </div>
-          </div>
-
-          <!-- 퇴원 행 — 일반퇴원 / 사망 구분 -->
-          <div class="mvrow" style="flex-direction:column;padding:0;">
-            <!-- 일반 퇴원 -->
-            <div style="display:flex;align-items:stretch;border-bottom:1px dashed var(--bdr);">
+      <!-- ── 입력 모드 ── -->
+      <div id="write-edit-mode">
+        <div class="tbar">
+          <label>📅 보고일자</label>
+          <input type="date" id="wr-date">
+          <button class="btn btn-ghost" onclick="loadReport()">📂 불러오기</button>
+          <button class="btn btn-gold"  onclick="saveReport()">💾 저장</button>
+          <button class="btn btn-ghost" onclick="window.print()">🖨 출력</button>
+        </div>
+        <div id="shift-forms"></div>
+        <div class="card">
+          <div class="chd"><h2>📋 입·퇴원·전실(이실) 현황</h2></div>
+          <div class="cbd" style="padding:0;">
+            <div class="mvrow">
               <div class="mvleft">
-                <div class="mv-badge mv-badge-dc">퇴원</div>
-                <input type="number" id="mv-dc" min="0" placeholder="0" class="mv-num">
+                <div class="mv-badge mv-badge-admit">입원</div>
+                <input type="number" id="mv-admit" min="0" placeholder="0" class="mv-num">
                 <span class="mv-unit">명</span>
               </div>
               <div class="mvright">
                 <div class="mv-rpt-title">📌 보고사항</div>
-                <textarea id="mv-dc-memo" placeholder="퇴원 관련 내용을 입력하세요"></textarea>
+                <textarea id="mv-admit-memo" placeholder="입원 관련 내용을 입력하세요"></textarea>
               </div>
             </div>
-            <!-- 사망 -->
-            <div style="display:flex;align-items:stretch;">
-              <div class="mvleft" style="background:#fdf6ff;">
-                <div class="mv-badge mv-badge-death">사망</div>
-                <input type="number" id="mv-death" min="0" placeholder="0" class="mv-num">
+            <div class="mvrow" style="flex-direction:column;padding:0;">
+              <div style="display:flex;align-items:stretch;border-bottom:1px dashed var(--bdr);">
+                <div class="mvleft">
+                  <div class="mv-badge mv-badge-dc">퇴원</div>
+                  <input type="number" id="mv-dc" min="0" placeholder="0" class="mv-num">
+                  <span class="mv-unit">명</span>
+                </div>
+                <div class="mvright">
+                  <div class="mv-rpt-title">📌 보고사항</div>
+                  <textarea id="mv-dc-memo" placeholder="퇴원 관련 내용을 입력하세요"></textarea>
+                </div>
+              </div>
+              <div style="display:flex;align-items:stretch;">
+                <div class="mvleft" style="background:#fdf6ff;">
+                  <div class="mv-badge mv-badge-death">사망</div>
+                  <input type="number" id="mv-death" min="0" placeholder="0" class="mv-num">
+                  <span class="mv-unit">명</span>
+                </div>
+                <div class="mvright" style="background:#fdf6ff;">
+                  <div class="mv-rpt-title">📌 보고사항</div>
+                  <textarea id="mv-death-memo" placeholder="사망 관련 내용을 입력하세요"></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="mvrow" style="border-bottom:none;">
+              <div class="mvleft">
+                <div class="mv-badge mv-badge-xfer">전실</div>
+                <input type="number" id="mv-xfer" min="0" placeholder="0" class="mv-num">
                 <span class="mv-unit">명</span>
               </div>
-              <div class="mvright" style="background:#fdf6ff;">
+              <div class="mvright">
                 <div class="mv-rpt-title">📌 보고사항</div>
-                <textarea id="mv-death-memo" placeholder="사망 관련 내용을 입력하세요"></textarea>
+                <textarea id="mv-xfer-memo" placeholder="전실/이실 관련 내용을 입력하세요"></textarea>
               </div>
             </div>
           </div>
-
-          <!-- 전실 행 -->
-          <div class="mvrow" style="border-bottom:none;">
-            <div class="mvleft">
-              <div class="mv-badge mv-badge-xfer">전실</div>
-              <input type="number" id="mv-xfer" min="0" placeholder="0" class="mv-num">
-              <span class="mv-unit">명</span>
-            </div>
-            <div class="mvright">
-              <div class="mv-rpt-title">📌 보고사항</div>
-              <textarea id="mv-xfer-memo" placeholder="전실/이실 관련 내용을 입력하세요"></textarea>
+        </div>
+        <div class="card-etc">
+          <div class="chd"><h2>📝 기타 특이사항</h2></div>
+          <div class="cbd">
+            <div class="fld">
+              <textarea id="etc-memo"
+                placeholder="낙상, 욕창, 이상반응, 환자상태 변화, 보호자 민원 등 기타 특이사항을 기록하세요."></textarea>
             </div>
           </div>
-
         </div>
-      </div>
+      </div><!-- /write-edit-mode -->
 
-      <!-- 기타 특이사항 -->
-      <div class="card-etc">
-        <div class="chd"><h2>📝 기타 특이사항</h2></div>
-        <div class="cbd">
-          <div class="fld">
-            <textarea id="etc-memo"
-              placeholder="낙상, 욕창, 이상반응, 환자상태 변화, 보호자 민원 등 기타 특이사항을 기록하세요."></textarea>
-          </div>
+      <!-- ── 미리보기 모드 ── -->
+      <div id="write-preview-mode" style="display:none;">
+        <div class="tbar">
+          <label>📅 보고일자</label>
+          <span id="prev-date-label" style="font-weight:700;color:var(--navy);font-size:14px;"></span>
+          <button class="btn btn-teal" onclick="switchToEdit()">✏️ 수정</button>
+          <button class="btn btn-ghost" onclick="window.print()">🖨 출력</button>
         </div>
-      </div>
-    </div>
+        <div id="preview-content"></div>
+      </div><!-- /write-preview-mode -->
+
+    </div><!-- /pg-write -->
 
     <!-- 일별 현황 (관리자) -->
     <div class="page" id="pg-admin">
@@ -492,6 +497,7 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
         <label>📅 조회일자</label>
         <input type="date" id="ad-date">
         <button class="btn btn-teal" onclick="loadAdmin()">🔍 조회</button>
+        <button class="btn btn-ghost" onclick="openTrashModal()">🗑 삭제 이력</button>
         <button class="btn btn-ghost" onclick="window.print()">🖨 출력</button>
       </div>
       <!-- 통계 5개 — 입원/퇴원/사망/총원/전실 -->
@@ -596,6 +602,26 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
     <div class="mft">
       <button class="btn btn-ghost" onclick="cm('user-modal')">취소</button>
       <button class="btn btn-teal" onclick="saveUser()">저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="ov" id="trash-modal">
+  <div class="modal" style="width:640px;">
+    <h2>🗑 삭제 이력 — <span id="trash-date-label"></span></h2>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">
+      삭제된 보고서를 복원하거나 완전히 삭제할 수 있습니다.
+    </p>
+    <div style="overflow-x:auto;">
+      <table class="tbl">
+        <thead><tr>
+          <th>일자</th><th>병동</th><th>작성자</th><th>삭제 정보</th><th>처리</th>
+        </tr></thead>
+        <tbody id="trash-tbody"></tbody>
+      </table>
+    </div>
+    <div class="mft">
+      <button class="btn btn-ghost" onclick="cm('trash-modal')">닫기</button>
     </div>
   </div>
 </div>
@@ -740,7 +766,24 @@ function renderApp(){
         <div><div class="wname">${CU.ward}</div>
         <div class="wsub">담당자: ${CU.name}</div></div>
       </div>`;
-    showPage('pg-write'); loadReport();
+    showPage('pg-write');
+    // 오늘 보고서 있으면 미리보기로 시작
+    (async()=>{
+      const snap = await db.collection('reports').doc(`${CU.ward}_${today()}`).get();
+      if(snap.exists){
+        const d = snap.data();
+        ['D','M','E','N'].forEach(s=>{
+          sv(`sh-${s}-staff`,d.shifts?.[s]?.staff);
+          sv(`sh-${s}-cnt`,  d.shifts?.[s]?.cnt);
+        });
+        sv('mv-admit',d.admit); sv('mv-dc',d.dc);
+        sv('mv-death',d.death); sv('mv-xfer',d.xfer);
+        sv('mv-admit-memo',d.admitMemo); sv('mv-dc-memo',d.dcMemo);
+        sv('mv-death-memo',d.deathMemo); sv('mv-xfer-memo',d.xferMemo);
+        sv('etc-memo',d.etcMemo);
+        switchToPreview(d);
+      }
+    })();
   }
 }
 
@@ -819,12 +862,85 @@ async function saveReport(){
   try{
     await db.collection('reports').doc(`${CU.ward}_${dt}`).set(data,{merge:true});
     toast('저장되었습니다.','ok');
+    switchToPreview(data);  // 저장 후 미리보기로 전환
   }catch(e){toast('저장 실패: '+e.message,'err');}
+}
+
+/* 미리보기 모드로 전환 */
+function switchToPreview(data){
+  g('write-edit-mode').style.display='none';
+  g('write-preview-mode').style.display='block';
+  g('prev-date-label').textContent = data.date;
+
+  // 근무자 현황
+  const shHtml = ['D','M','E','N'].map(s=>{
+    const sh = data.shifts?.[s]||{};
+    const bg  = s==='D'?'var(--D)':s==='M'?'#E8F5E9':s==='E'?'var(--E)':'var(--N)';
+    const col = s==='D'?'var(--Db)':s==='M'?'#2E7D32':s==='E'?'var(--Eb)':'var(--Nb)';
+    const cntHtml = s==='N' && sh.cnt && sh.cnt!=='0'
+      ? `<div class="si" style="margin-top:3px;"><b>재원:</b> ${sh.cnt}명</div>` : '';
+    return `
+    <div class="sc">
+      <div class="sn"><span class="dot d${s}">${s}</span></div>
+      <div class="si"><b>근무자:</b> ${sh.staff||'—'}</div>
+      ${cntHtml}
+    </div>`;
+  }).join('');
+
+  // 입퇴원 행 헬퍼
+  const mvRow=(badge,cls,cnt,memo,bg='')=>{
+    if((!cnt||cnt==='0')&&!memo) return '';
+    return `
+    <div class="adm-mvrow" style="${bg?'background:'+bg:''}">
+      <div class="adm-mvleft" style="${bg?'background:'+bg:''}">
+        <div class="mv-badge ${cls}" style="width:36px;height:36px;font-size:12px;">${badge}</div>
+        <span class="adm-mvcnt">${cnt||0}명</span>
+      </div>
+      <div class="adm-mvright" style="${bg?'background:'+bg:''}">
+        <div class="mv-rpt-title">📌 보고사항</div>
+        <div class="adm-mvmemo">${memo?esc(memo):'<span style="color:#ccc">—</span>'}</div>
+      </div>
+    </div>`;
+  };
+
+  const etcHtml = data.etcMemo ? `
+    <div class="wcs">
+      <div class="wclbl">기타 특이사항</div>
+      <div style="font-size:13px;white-space:pre-wrap;line-height:1.7;">${esc(data.etcMemo)}</div>
+    </div>` : '';
+
+  g('preview-content').innerHTML = `
+    <div class="wc">
+      <div class="wchd">
+        <h3>🏥 ${data.ward}</h3>
+        <span class="pill pok">✅ 저장완료</span>
+      </div>
+      <div class="wcs">
+        <div class="wclbl">근무자 현황</div>
+        <div class="sr">${shHtml}</div>
+      </div>
+      <div class="wcs" style="padding:0;">
+        <div class="wclbl" style="padding:10px 17px 6px;">입·퇴원·전실</div>
+        ${mvRow('입원','mv-badge-admit',data.admit,data.admitMemo)||'<div style="padding:10px 17px;color:var(--muted);font-size:13px;">—</div>'}
+        ${mvRow('퇴원','mv-badge-dc',   data.dc,   data.dcMemo)}
+        ${mvRow('사망','mv-badge-death', data.death,data.deathMemo,'#fdf6ff')}
+        ${mvRow('전실','mv-badge-xfer',  data.xfer, data.xferMemo)}
+      </div>
+      ${etcHtml}
+    </div>`;
+}
+
+/* 수정 모드로 전환 */
+function switchToEdit(){
+  g('write-preview-mode').style.display='none';
+  g('write-edit-mode').style.display='block';
 }
 
 async function loadReport(){
   const dt=g('wr-date').value; if(!dt) return;
   clearForm();
+  // 날짜 바꾸면 편집모드로 초기화
+  switchToEdit();
   try{
     const snap=await db.collection('reports').doc(`${CU.ward}_${dt}`).get();
     if(!snap.exists){toast('해당 날짜 보고서가 없습니다.');return;}
@@ -838,7 +954,7 @@ async function loadReport(){
     sv('mv-admit-memo',d.admitMemo); sv('mv-dc-memo',d.dcMemo);
     sv('mv-death-memo',d.deathMemo); sv('mv-xfer-memo',d.xferMemo);
     sv('etc-memo',d.etcMemo);
-    toast('불러왔습니다.','ok');
+    toast('불러왔습니다. 확인 후 저장하세요.','ok');
   }catch(e){toast('불러오기 실패: '+e.message,'err');}
 }
 
@@ -926,6 +1042,8 @@ async function loadAdmin(){
             <div style="display:flex;align-items:center;gap:8px;">
               <span style="font-size:12px;opacity:.8;">작성: ${r.writer}</span>
               <span class="pill pok">제출완료</span>
+              <button class="btn btn-danger btn-xs"
+                onclick="deleteReport('${ward}','${g('ad-date').value}',this)">🗑 삭제</button>
             </div>
           </div>
           <div class="wcs">
@@ -946,6 +1064,93 @@ async function loadAdmin(){
   }catch(e){
     con.innerHTML=`<div style="color:red;padding:20px;">오류: ${e.message}</div>`;
   }
+}
+
+/* ================================================================
+   보고서 삭제 / 복원
+================================================================ */
+async function deleteReport(ward, date, btn) {
+  if (!confirm(`[${ward}] ${date} 보고서를 삭제하시겠습니까?\n삭제 후 복원 가능합니다.`)) return;
+  const docId = `${ward}_${date}`;
+  try {
+    // 현재 데이터를 휴지통 컬렉션에 백업
+    const snap = await db.collection('reports').doc(docId).get();
+    if (!snap.exists) { toast('보고서를 찾을 수 없습니다.','err'); return; }
+    const data = snap.data();
+    data._deletedAt = new Date().toISOString();
+    data._deletedBy = CU.name;
+    await db.collection('reports_trash').doc(docId).set(data);
+    await db.collection('reports').doc(docId).delete();
+    toast(`[${ward}] 보고서가 삭제되었습니다.`, 'ok');
+    loadAdmin();
+  } catch(e) { toast('삭제 실패: '+e.message,'err'); }
+}
+
+async function openTrashModal() {
+  const dt = g('ad-date').value;
+  g('trash-date-label').textContent = dt || '전체';
+  const tbody = g('trash-tbody');
+  tbody.innerHTML = '<tr><td colspan="5" class="loading">조회 중...</td></tr>';
+  om('trash-modal');
+  try {
+    let q = db.collection('reports_trash').orderBy('_deletedAt','desc');
+    const snap = await q.get();
+    tbody.innerHTML = '';
+    let count = 0;
+    snap.forEach(d => {
+      const r = d.data();
+      // 선택된 날짜 필터 (날짜 선택 시)
+      if (dt && r.date !== dt) return;
+      count++;
+      const tr = document.createElement('tr');
+      const delAt = r._deletedAt ? r._deletedAt.slice(0,16).replace('T',' ') : '—';
+      tr.innerHTML = `
+        <td>${r.date}</td>
+        <td>${r.ward}</td>
+        <td>${r.writer||'—'}</td>
+        <td style="font-size:11px;color:var(--muted);">${delAt}<br>by ${r._deletedBy||'—'}</td>
+        <td>
+          <button class="btn btn-teal btn-xs" onclick="restoreReport('${d.id}')">↩ 복원</button>
+          <button class="btn btn-danger btn-xs" style="margin-left:4px;"
+            onclick="hardDeleteReport('${d.id}')">완전삭제</button>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+    if (!count)
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted);">삭제된 보고서가 없습니다.</td></tr>';
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="5" style="color:red;">오류: ${e.message}</td></tr>`;
+  }
+}
+
+async function restoreReport(docId) {
+  if (!confirm('보고서를 복원하시겠습니까?')) return;
+  try {
+    const snap = await db.collection('reports_trash').doc(docId).get();
+    if (!snap.exists) { toast('복원할 데이터가 없습니다.','err'); return; }
+    const data = snap.data();
+    delete data._deletedAt;
+    delete data._deletedBy;
+    // 현재 같은 날짜 보고서가 있으면 경고
+    const exists = await db.collection('reports').doc(docId).get();
+    if (exists.exists) {
+      if (!confirm('해당 날짜에 이미 보고서가 있습니다. 덮어쓰시겠습니까?')) return;
+    }
+    await db.collection('reports').doc(docId).set(data);
+    await db.collection('reports_trash').doc(docId).delete();
+    toast('복원되었습니다.','ok');
+    openTrashModal();
+    loadAdmin();
+  } catch(e) { toast('복원 실패: '+e.message,'err'); }
+}
+
+async function hardDeleteReport(docId) {
+  if (!confirm('완전 삭제하면 복원이 불가능합니다. 정말 삭제하시겠습니까?')) return;
+  try {
+    await db.collection('reports_trash').doc(docId).delete();
+    toast('완전 삭제되었습니다.','ok');
+    openTrashModal();
+  } catch(e) { toast('삭제 실패: '+e.message,'err'); }
 }
 
 /* USER MANAGEMENT */

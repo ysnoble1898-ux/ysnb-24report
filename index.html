@@ -195,21 +195,27 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
   background:#F8FAFB;padding:8px 10px;border-radius:6px;
   border-left:3px solid var(--teal);}
 
-/* 입퇴원 행 레이아웃 */
-.mv-row{display:flex;gap:14px;align-items:flex-start;
-  padding-bottom:14px;margin-bottom:14px;
-  border-bottom:1px dashed var(--bdr);}
-.mv-cnt-wrap{display:flex;align-items:center;gap:10px;flex-shrink:0;width:130px;}
+/* 입퇴원 행 레이아웃 — 이미지대로 */
+.mvrow{display:flex;align-items:stretch;border-bottom:1px solid var(--bdr);}
+.mvleft{display:flex;align-items:center;gap:8px;padding:12px 16px;
+  width:150px;flex-shrink:0;border-right:1px solid var(--bdr);background:#fafbfc;}
 .mv-badge{display:inline-flex;align-items:center;justify-content:center;
-  width:44px;height:44px;border-radius:8px;font-size:13px;font-weight:800;
-  flex-shrink:0;}
+  width:40px;height:40px;border-radius:8px;font-size:13px;font-weight:800;flex-shrink:0;}
 .mv-badge-admit{background:#E3F2FD;color:#1565C0;border:2px solid #1565C0;}
 .mv-badge-dc   {background:#FBE9E7;color:#BF360C;border:2px solid #BF360C;}
 .mv-badge-xfer {background:#EDE7F6;color:#4527A0;border:2px solid #4527A0;}
-.mv-cnt-fld{flex:1;}
-.mv-cnt-fld input{width:70px;text-align:center;font-size:15px;font-weight:700;}
-.mv-memo-fld{flex:1;}
-.mv-memo-fld textarea{min-height:60px;font-size:13px;}
+.mv-num{width:52px;text-align:center;font-size:16px;font-weight:700;
+  padding:6px 4px;border:1.5px solid var(--bdr);border-radius:6px;
+  font-family:inherit;outline:none;}
+.mv-num:focus{border-color:var(--teal);}
+.mv-unit{font-size:13px;color:var(--muted);font-weight:600;}
+.mvright{flex:1;padding:10px 14px;display:flex;flex-direction:column;gap:4px;
+  background:#FFFDE7;border-left:3px solid #F9A825;}
+.mv-rpt-title{font-size:12px;font-weight:700;color:#E65100;}
+.mvright textarea{flex:1;min-height:52px;font-size:13px;font-family:inherit;
+  border:1.5px solid #FFE082;border-radius:6px;padding:7px 10px;
+  outline:none;resize:vertical;background:#fff;}
+.mvright textarea:focus{border-color:#F9A825;}
 .mr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
 .mi{background:#f8f9fb;border-radius:6px;padding:8px 12px;text-align:center;}
 .mi .ml{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:2px;}
@@ -332,9 +338,11 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
       <p>병동 통합 보고 관리 플랫폼</p>
     </div>
     <div class="fg"><label>아이디</label>
-      <input id="li-id" type="text" placeholder="아이디 입력" autocomplete="username"></div>
+      <input id="li-id" type="text" placeholder="아이디 입력"
+             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
     <div class="fg"><label>비밀번호</label>
       <input id="li-pw" type="password" placeholder="비밀번호 입력"
+             autocomplete="new-password"
              onkeydown="if(event.key==='Enter')login()"></div>
     <button class="btn-login" onclick="login()">로그인</button>
     <div class="lerr" id="li-err"></div>
@@ -372,51 +380,45 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
       </div>
       <div id="shift-forms"></div>
       <div class="card">
-        <div class="chd"><h2>📋 입·퇴원·전실(이실) 현황 및 보고사항</h2></div>
-        <div class="cbd">
+        <div class="chd"><h2>📋 입·퇴원·전실(이실) 현황</h2></div>
+        <div class="cbd" style="padding:0;">
 
           <!-- 입원 행 -->
-          <div class="mv-row">
-            <div class="mv-cnt-wrap">
+          <div class="mvrow">
+            <div class="mvleft">
               <div class="mv-badge mv-badge-admit">입원</div>
-              <div class="fld mv-cnt-fld">
-                <label>명수</label>
-                <input type="number" id="mv-admit" min="0" placeholder="0">
-              </div>
+              <input type="number" id="mv-admit" min="0" placeholder="0" class="mv-num">
+              <span class="mv-unit">명</span>
             </div>
-            <div class="fld mv-memo-fld">
-              <label>보고사항</label>
-              <textarea id="mv-admit-memo" placeholder="입원 관련 내용 (환자명, 병실, 특이사항 등)"></textarea>
+            <div class="mvright">
+              <div class="mv-rpt-title">📌 보고사항</div>
+              <textarea id="mv-admit-memo" placeholder="입원 관련 내용을 입력하세요"></textarea>
             </div>
           </div>
 
           <!-- 퇴원 행 -->
-          <div class="mv-row">
-            <div class="mv-cnt-wrap">
+          <div class="mvrow">
+            <div class="mvleft">
               <div class="mv-badge mv-badge-dc">퇴원</div>
-              <div class="fld mv-cnt-fld">
-                <label>명수</label>
-                <input type="number" id="mv-dc" min="0" placeholder="0">
-              </div>
+              <input type="number" id="mv-dc" min="0" placeholder="0" class="mv-num">
+              <span class="mv-unit">명</span>
             </div>
-            <div class="fld mv-memo-fld">
-              <label>보고사항</label>
-              <textarea id="mv-dc-memo" placeholder="퇴원 관련 내용 (환자명, 퇴원 사유, 특이사항 등)"></textarea>
+            <div class="mvright">
+              <div class="mv-rpt-title">📌 보고사항</div>
+              <textarea id="mv-dc-memo" placeholder="퇴원 관련 내용을 입력하세요"></textarea>
             </div>
           </div>
 
-          <!-- 전실/이실 행 -->
-          <div class="mv-row" style="border-bottom:none;margin-bottom:0;padding-bottom:0;">
-            <div class="mv-cnt-wrap">
+          <!-- 전실 행 -->
+          <div class="mvrow" style="border-bottom:none;">
+            <div class="mvleft">
               <div class="mv-badge mv-badge-xfer">전실</div>
-              <div class="fld mv-cnt-fld">
-                <label>명수</label>
-                <input type="number" id="mv-xfer" min="0" placeholder="0">
-              </div>
+              <input type="number" id="mv-xfer" min="0" placeholder="0" class="mv-num">
+              <span class="mv-unit">명</span>
             </div>
-            <div class="fld mv-memo-fld">
-              <label>보고사항</label>
-              <textarea id="mv-xfer-memo" placeholder="전실/이실 관련 내용 (환자명, 이동 병동 등)"></textarea>
+            <div class="mvright">
+              <div class="mv-rpt-title">📌 보고사항</div>
+              <textarea id="mv-xfer-memo" placeholder="전실/이실 관련 내용을 입력하세요"></textarea>
             </div>
           </div>
 
@@ -572,6 +574,14 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 db.enablePersistence({synchronizeTabs:true}).catch(()=>{});
 
+/* 자동완성 강제 차단 — 페이지 로드 후 필드 비우기 */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    g('li-id').value = '';
+    g('li-pw').value = '';
+  }, 100);
+});
+
 const WARDS = ['집중관찰실','3병동','5병동','호스피스병동'];
 let CU = null;
 let pwTarget = null;
@@ -668,11 +678,10 @@ function showPage(id){
 /* SHIFT FORMS — 담당의 제거 (요청 1) */
 function buildShiftForms(){
   const c=g('shift-forms'); c.innerHTML='';
-  const info={D:'D번',E:'E번',N:'N번'};
   ['D','E','N'].forEach(s=>{
     c.innerHTML+=`
     <div class="sw">
-      <div class="shd ${s}"><span class="dot d${s}">${s}</span><span>${info[s]}</span></div>
+      <div class="shd ${s}"><span class="dot d${s}">${s}</span></div>
       <div class="sbd">
         <div class="g2">
           <div class="fld"><label>근무자 성명 (쉼표 구분)</label>

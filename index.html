@@ -210,12 +210,12 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
 .mv-num:focus{border-color:var(--teal);}
 .mv-unit{font-size:13px;color:var(--muted);font-weight:600;}
 .mvright{flex:1;padding:10px 14px;display:flex;flex-direction:column;gap:4px;
-  background:#FFFDE7;border-left:3px solid #F9A825;}
-.mv-rpt-title{font-size:12px;font-weight:700;color:#E65100;}
+  background:var(--bg);border-left:1px solid var(--bdr);}
+.mv-rpt-title{font-size:12px;font-weight:700;color:var(--muted);}
 .mvright textarea{flex:1;min-height:52px;font-size:13px;font-family:inherit;
-  border:1.5px solid #FFE082;border-radius:6px;padding:7px 10px;
+  border:1.5px solid var(--bdr);border-radius:6px;padding:7px 10px;
   outline:none;resize:vertical;background:#fff;}
-.mvright textarea:focus{border-color:#F9A825;}
+.mvright textarea:focus{border-color:var(--teal);}
 .mr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
 .mi{background:#f8f9fb;border-radius:6px;padding:8px 12px;text-align:center;}
 .mi .ml{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:2px;}
@@ -229,13 +229,13 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
 .adm-mvleft{display:flex;align-items:center;gap:8px;padding:10px 14px;
   width:130px;flex-shrink:0;border-right:1px solid var(--bdr);background:#fafbfc;}
 .adm-mvcnt{font-size:14px;font-weight:700;color:var(--navy);}
-.adm-mvright{flex:1;padding:8px 13px;background:#FFFDE7;
-  border-left:3px solid #F9A825;display:flex;flex-direction:column;gap:3px;}
+.adm-mvright{flex:1;padding:8px 13px;background:var(--bg);
+  border-left:1px solid var(--bdr);display:flex;flex-direction:column;gap:3px;}
 .adm-mvmemo{font-size:13px;color:var(--txt);white-space:pre-wrap;line-height:1.6;}
 
 /* 보고사항 뷰 */
-.memo-section{background:#FFFDE7;border:2px solid #F9A825;border-radius:var(--r);padding:14px 18px;}
-.memo-section .memo-title{font-size:16px;font-weight:800;color:#E65100;margin-bottom:10px;
+.memo-section{background:var(--bg);border:1.5px solid var(--bdr);border-radius:var(--r);padding:14px 18px;}
+.memo-section .memo-title{font-size:16px;font-weight:800;color:var(--navy);margin-bottom:10px;
   display:flex;align-items:center;gap:6px;}
 .mbox{font-size:15px;white-space:pre-wrap;line-height:1.8;color:#1A1F2E;}
 
@@ -716,15 +716,21 @@ function showPage(id){
 function buildShiftForms(){
   const c=g('shift-forms'); c.innerHTML='';
   ['D','E','N'].forEach(s=>{
+    const cntField = s==='N' ? `
+        <div class="fld" style="width:160px;">
+          <label>재원 환자 수 (명)</label>
+          <input type="number" id="sh-${s}-cnt" min="0" placeholder="0">
+        </div>` : '';
     c.innerHTML+=`
     <div class="sw">
       <div class="shd ${s}"><span class="dot d${s}">${s}</span></div>
       <div class="sbd">
-        <div class="g2">
-          <div class="fld"><label>근무자 성명 (쉼표 구분)</label>
-            <input id="sh-${s}-staff" placeholder="예) 김간호, 이간호"></div>
-          <div class="fld"><label>재원 환자 수 (명)</label>
-            <input type="number" id="sh-${s}-cnt" min="0" placeholder="0"></div>
+        <div style="display:flex;gap:11px;align-items:flex-end;flex-wrap:wrap;">
+          <div class="fld" style="flex:1;min-width:180px;">
+            <label>근무자 성명 (쉼표 구분)</label>
+            <input id="sh-${s}-staff" placeholder="예) 김간호, 이간호">
+          </div>
+          ${cntField}
         </div>
         <div class="stitle">인계 / 특이사항</div>
         <div class="fld">
@@ -827,14 +833,16 @@ async function loadAdmin(){
           <div style="padding:22px;text-align:center;color:var(--muted);font-size:14px;">
             보고서가 아직 작성되지 않았습니다.</div>`;
       } else {
-        /* 관리자 뷰 — D/E/N 시간 없이 dot만 */
+        /* 관리자 뷰 — D/E/N dot만, N번만 재원 표시 */
         const shHtml=['D','E','N'].map(s=>{
           const sh=r.shifts?.[s]||{};
+          const cntHtml = s==='N'
+            ? `<div class="si"><b>재원:</b> ${sh.cnt||'—'}명</div>` : '';
           return `
           <div class="sc">
             <div class="sn"><span class="dot d${s}">${s}</span></div>
             <div class="si"><b>근무자:</b> ${sh.staff||'—'}</div>
-            <div class="si"><b>재원:</b> ${sh.cnt||'—'}명</div>
+            ${cntHtml}
             ${sh.memo?`<div class="sm">${esc(sh.memo)}</div>`:''}
           </div>`;
         }).join('');

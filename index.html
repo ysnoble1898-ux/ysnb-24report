@@ -591,6 +591,31 @@ window.addEventListener('load', () => {
   }, 100);
 });
 
+/* 세션 유지 — 새로고침해도 로그인 상태 복원 */
+window.addEventListener('load', async () => {
+  const saved = sessionStorage.getItem('ynb_session');
+  if (!saved) return;
+  try {
+    const u = JSON.parse(saved);
+    // Firestore에서 최신 정보 확인 (활성 여부 등)
+    const snap = await db.collection('users').doc(u.id).get();
+    if (snap.exists && snap.data().active) {
+      CU = snap.data();
+      renderApp();
+    } else {
+      sessionStorage.removeItem('ynb_session');
+    }
+  } catch(e) {
+    // 오프라인 시 캐시 데이터로 복원
+    try {
+      CU = JSON.parse(saved);
+      renderApp();
+    } catch(e2) {
+      sessionStorage.removeItem('ynb_session');
+    }
+  }
+});
+
 const WARDS = ['집중관찰실','3병동','5병동','호스피스병동'];
 let CU = null;
 let pwTarget = null;
@@ -627,12 +652,15 @@ async function login(){
     const u=snap.data();
     if(!u.active){err.textContent='비활성화된 계정입니다.';return;}
     if(u.pwHash!==await sha256(pw)){err.textContent='비밀번호가 올바르지 않습니다.';return;}
-    CU=u; renderApp();
+    CU=u; 
+    sessionStorage.setItem('ynb_session', JSON.stringify(u));
+    renderApp();
   }catch(e){err.textContent='로그인 오류: '+e.message;}
 }
 
 function logout(){
   CU=null;
+  sessionStorage.removeItem('ynb_session');
   g('app').style.display='none';
   g('login-screen').style.display='flex';
   g('li-pw').value=''; g('li-err').textContent='';

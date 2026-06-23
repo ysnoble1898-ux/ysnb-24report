@@ -11,6 +11,13 @@
 <title>24시간 보고서 | 연세노블병원</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
+<!-- PC PWA 아이콘 (Chrome/Edge 설치용) -->
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<style>
+  #print-title{display:none;text-align:center;font-size:15px;font-weight:700;
+    color:#1B2A4A;padding:6px 0 10px;border-bottom:2px solid #1B2A4A;margin-bottom:8px;}
+</style>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <style>
@@ -188,11 +195,11 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
   background:#F8FAFB;padding:8px 10px;border-radius:6px;
   border-left:3px solid var(--teal);}
 
-/* 입퇴원 수치 (요청 2) */
-.mr{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-.mi{background:#f8f9fb;border-radius:6px;padding:10px 14px;text-align:center;}
-.mi .ml{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px;}
-.mi .mv{font-size:20px;font-weight:800;color:var(--navy);}
+/* 입퇴원 수치 — 일반 크기 */
+.mr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.mi{background:#f8f9fb;border-radius:6px;padding:8px 12px;text-align:center;}
+.mi .ml{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:2px;}
+.mi .mv{font-size:13px;font-weight:700;color:var(--navy);}
 .mi.admit .mv{color:#1565C0;}
 .mi.dc    .mv{color:#BF360C;}
 .mi.xfer  .mv{color:var(--Nb);}
@@ -264,9 +271,37 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
   .stats{grid-template-columns:1fr 1fr;}
 }
 @media print{
+  @page{size:A4 portrait;margin:8mm 8mm 8mm 8mm;}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
   .hdr,.nav,.tbar,.btn,.ov,#offline-bar{display:none!important;}
-  .card,.card-memo,.wc{box-shadow:none;}
-  body{background:#fff;}
+  .card,.card-memo,.wc{box-shadow:none;break-inside:avoid;page-break-inside:avoid;}
+  body{background:#fff;font-size:11px;}
+  .main{padding:0;max-width:100%;}
+  /* 병동 카드 — 2열 그리드로 1장에 맞춤 */
+  #admin-cards{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+  .wc{margin-bottom:0;border:1px solid #ccc;}
+  .wchd{padding:6px 10px;}
+  .wchd h3{font-size:13px;}
+  .wcs{padding:6px 10px;}
+  .wclbl{font-size:9px;margin-bottom:5px;}
+  .sr{gap:8px;}
+  .sc .si{font-size:11px;}
+  .sc .si b{font-size:11px;}
+  .sc .sm{font-size:10px;padding:4px 6px;}
+  .mr{gap:4px;}
+  .mi{padding:4px 6px;}
+  .mi .ml{font-size:9px;}
+  .mi .mv{font-size:11px;}
+  .memo-section{padding:6px 10px;}
+  .memo-section .memo-title{font-size:12px;margin-bottom:4px;}
+  .mbox{font-size:11px;line-height:1.5;}
+  .stats{grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:6px;}
+  .stat{padding:6px 10px;}
+  .stat .n{font-size:18px;}
+  .stat .l{font-size:9px;}
+  .pill{font-size:9px;padding:1px 5px;}
+  /* 페이지 제목 프린트용 */
+  #print-title{display:block!important;}
 }
 </style>
 </head>
@@ -357,6 +392,7 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
 
     <!-- 일별 현황 (관리자) -->
     <div class="page" id="pg-admin">
+      <div id="print-title">연세노블병원 24시간 보고서</div>
       <div class="tbar">
         <label>📅 조회일자</label>
         <input type="date" id="ad-date">

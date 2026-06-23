@@ -195,7 +195,21 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
   background:#F8FAFB;padding:8px 10px;border-radius:6px;
   border-left:3px solid var(--teal);}
 
-/* 입퇴원 수치 — 일반 크기 */
+/* 입퇴원 행 레이아웃 */
+.mv-row{display:flex;gap:14px;align-items:flex-start;
+  padding-bottom:14px;margin-bottom:14px;
+  border-bottom:1px dashed var(--bdr);}
+.mv-cnt-wrap{display:flex;align-items:center;gap:10px;flex-shrink:0;width:130px;}
+.mv-badge{display:inline-flex;align-items:center;justify-content:center;
+  width:44px;height:44px;border-radius:8px;font-size:13px;font-weight:800;
+  flex-shrink:0;}
+.mv-badge-admit{background:#E3F2FD;color:#1565C0;border:2px solid #1565C0;}
+.mv-badge-dc   {background:#FBE9E7;color:#BF360C;border:2px solid #BF360C;}
+.mv-badge-xfer {background:#EDE7F6;color:#4527A0;border:2px solid #4527A0;}
+.mv-cnt-fld{flex:1;}
+.mv-cnt-fld input{width:70px;text-align:center;font-size:15px;font-weight:700;}
+.mv-memo-fld{flex:1;}
+.mv-memo-fld textarea{min-height:60px;font-size:13px;}
 .mr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
 .mi{background:#f8f9fb;border-radius:6px;padding:8px 12px;text-align:center;}
 .mi .ml{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:2px;}
@@ -358,34 +372,54 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
       </div>
       <div id="shift-forms"></div>
       <div class="card">
-        <div class="chd"><h2>📋 입·퇴원·전실(이실) 현황</h2></div>
+        <div class="chd"><h2>📋 입·퇴원·전실(이실) 현황 및 보고사항</h2></div>
         <div class="cbd">
-          <div class="g3">
-            <div class="fld"><label>입원 (명)</label>
-              <input type="number" id="mv-admit" min="0" placeholder="0"></div>
-            <div class="fld"><label>퇴원 (명)</label>
-              <input type="number" id="mv-dc" min="0" placeholder="0"></div>
-            <div class="fld"><label>전실/이실 (명)</label>
-              <input type="number" id="mv-xfer" min="0" placeholder="0"></div>
-          </div>
-          <div style="margin-top:11px;">
-            <div class="fld"><label>상세 내역</label>
-              <textarea id="mv-detail" placeholder="예) 홍길동 3병동→5병동, 김철수 내과 입원 등"></textarea>
+
+          <!-- 입원 행 -->
+          <div class="mv-row">
+            <div class="mv-cnt-wrap">
+              <div class="mv-badge mv-badge-admit">입원</div>
+              <div class="fld mv-cnt-fld">
+                <label>명수</label>
+                <input type="number" id="mv-admit" min="0" placeholder="0">
+              </div>
+            </div>
+            <div class="fld mv-memo-fld">
+              <label>보고사항</label>
+              <textarea id="mv-admit-memo" placeholder="입원 관련 내용 (환자명, 병실, 특이사항 등)"></textarea>
             </div>
           </div>
-        </div>
-      </div>
-      <!-- 보고사항 강조 카드 (요청 4) -->
-      <div class="card-memo">
-        <div class="chd">
-          <h2>📌 보고사항</h2>
-        </div>
-        <div class="cbd">
-          <div class="fld">
-            <label>특이사항 / 보고내용</label>
-            <textarea id="rpt-memo" style="min-height:120px;"
-              placeholder="낙상, 욕창, 이상반응, 환자상태 변화, 보호자 민원 등 특이사항을 기록하세요."></textarea>
+
+          <!-- 퇴원 행 -->
+          <div class="mv-row">
+            <div class="mv-cnt-wrap">
+              <div class="mv-badge mv-badge-dc">퇴원</div>
+              <div class="fld mv-cnt-fld">
+                <label>명수</label>
+                <input type="number" id="mv-dc" min="0" placeholder="0">
+              </div>
+            </div>
+            <div class="fld mv-memo-fld">
+              <label>보고사항</label>
+              <textarea id="mv-dc-memo" placeholder="퇴원 관련 내용 (환자명, 퇴원 사유, 특이사항 등)"></textarea>
+            </div>
           </div>
+
+          <!-- 전실/이실 행 -->
+          <div class="mv-row" style="border-bottom:none;margin-bottom:0;padding-bottom:0;">
+            <div class="mv-cnt-wrap">
+              <div class="mv-badge mv-badge-xfer">전실</div>
+              <div class="fld mv-cnt-fld">
+                <label>명수</label>
+                <input type="number" id="mv-xfer" min="0" placeholder="0">
+              </div>
+            </div>
+            <div class="fld mv-memo-fld">
+              <label>보고사항</label>
+              <textarea id="mv-xfer-memo" placeholder="전실/이실 관련 내용 (환자명, 이동 병동 등)"></textarea>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -634,7 +668,7 @@ function showPage(id){
 /* SHIFT FORMS — 담당의 제거 (요청 1) */
 function buildShiftForms(){
   const c=g('shift-forms'); c.innerHTML='';
-  const info={D:'D번 (07:00~15:00)',E:'E번 (15:00~23:00)',N:'N번 (23:00~07:00)'};
+  const info={D:'D번',E:'E번',N:'N번'};
   ['D','E','N'].forEach(s=>{
     c.innerHTML+=`
     <div class="sw">
@@ -671,11 +705,12 @@ async function saveReport(){
   const data={
     ward:CU.ward, date:dt, writer:CU.name, writerId:CU.id,
     shifts,
-    admit: v('mv-admit')||'0',
-    dc:    v('mv-dc')||'0',
-    xfer:  v('mv-xfer')||'0',
-    detail:v('mv-detail'),
-    memo:  v('rpt-memo'),
+    admit:      v('mv-admit')||'0',
+    dc:         v('mv-dc')||'0',
+    xfer:       v('mv-xfer')||'0',
+    admitMemo:  v('mv-admit-memo'),
+    dcMemo:     v('mv-dc-memo'),
+    xferMemo:   v('mv-xfer-memo'),
     updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
   };
   try{
@@ -697,14 +732,14 @@ async function loadReport(){
       sv(`sh-${s}-memo`, d.shifts?.[s]?.memo);
     });
     sv('mv-admit',d.admit); sv('mv-dc',d.dc); sv('mv-xfer',d.xfer);
-    sv('mv-detail',d.detail); sv('rpt-memo',d.memo);
+    sv('mv-admit-memo',d.admitMemo); sv('mv-dc-memo',d.dcMemo); sv('mv-xfer-memo',d.xferMemo);
     toast('불러왔습니다.','ok');
   }catch(e){toast('불러오기 실패: '+e.message,'err');}
 }
 
 function clearForm(){
   ['D','E','N'].forEach(s=>['staff','cnt','memo'].forEach(f=>sv(`sh-${s}-${f}`,'')));
-  ['mv-admit','mv-dc','mv-xfer','mv-detail','rpt-memo'].forEach(id=>sv(id,''));
+  ['mv-admit','mv-dc','mv-xfer','mv-admit-memo','mv-dc-memo','mv-xfer-memo'].forEach(id=>sv(id,''));
 }
 
 /* ADMIN VIEW */
@@ -783,15 +818,29 @@ async function loadAdmin(){
           </div>
           <div class="wcs">
             <div class="wclbl">입·퇴원·전실</div>
-            <div class="mr">
-              <div class="mi admit">
-                <div class="ml">입원</div><div class="mv">${r.admit||0}명</div></div>
-              <div class="mi dc">
-                <div class="ml">퇴원</div><div class="mv">${r.dc||0}명</div></div>
-              <div class="mi xfer">
-                <div class="ml">전실/이실</div><div class="mv">${r.xfer||0}명</div></div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;align-items:flex-start;gap:10px;">
+                <div class="mv-badge mv-badge-admit" style="width:36px;height:36px;font-size:12px;flex-shrink:0;">입원</div>
+                <div style="flex:1;">
+                  <div style="font-size:13px;font-weight:700;color:#1565C0;">${r.admit||0}명</div>
+                  ${r.admitMemo?`<div style="font-size:12px;color:var(--muted);margin-top:2px;white-space:pre-wrap;">${esc(r.admitMemo)}</div>`:''}
+                </div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:10px;">
+                <div class="mv-badge mv-badge-dc" style="width:36px;height:36px;font-size:12px;flex-shrink:0;">퇴원</div>
+                <div style="flex:1;">
+                  <div style="font-size:13px;font-weight:700;color:#BF360C;">${r.dc||0}명</div>
+                  ${r.dcMemo?`<div style="font-size:12px;color:var(--muted);margin-top:2px;white-space:pre-wrap;">${esc(r.dcMemo)}</div>`:''}
+                </div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:10px;">
+                <div class="mv-badge mv-badge-xfer" style="width:36px;height:36px;font-size:12px;flex-shrink:0;">전실</div>
+                <div style="flex:1;">
+                  <div style="font-size:13px;font-weight:700;color:#4527A0;">${r.xfer||0}명</div>
+                  ${r.xferMemo?`<div style="font-size:12px;color:var(--muted);margin-top:2px;white-space:pre-wrap;">${esc(r.xferMemo)}</div>`:''}
+                </div>
+              </div>
             </div>
-            ${r.detail?`<div style="margin-top:10px;font-size:13px;color:var(--muted);white-space:pre-wrap;">${esc(r.detail)}</div>`:''}
           </div>
           ${memoHtml}`;
       }
@@ -932,10 +981,23 @@ function showDetail(btn){
   g('dm-body').innerHTML=`
     ${shHtml}
     <div style="padding:12px;background:#f5f7fa;border-radius:6px;margin-top:6px;">
-      <b style="color:#1565C0">입원: ${r.admit||0}명</b> &nbsp;
-      <b style="color:#BF360C">퇴원: ${r.dc||0}명</b> &nbsp;
-      이실: ${r.xfer||0}명
-      ${r.detail?`<div style="margin-top:6px;font-size:13px;color:var(--muted);white-space:pre-wrap;">${esc(r.detail)}</div>`:''}
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <div class="mv-badge mv-badge-admit" style="width:36px;height:36px;font-size:12px;flex-shrink:0;">입원</div>
+          <div><div style="font-weight:700;color:#1565C0;">${r.admit||0}명</div>
+            ${r.admitMemo?`<div style="font-size:12px;color:var(--muted);white-space:pre-wrap;">${esc(r.admitMemo)}</div>`:''}</div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <div class="mv-badge mv-badge-dc" style="width:36px;height:36px;font-size:12px;flex-shrink:0;">퇴원</div>
+          <div><div style="font-weight:700;color:#BF360C;">${r.dc||0}명</div>
+            ${r.dcMemo?`<div style="font-size:12px;color:var(--muted);white-space:pre-wrap;">${esc(r.dcMemo)}</div>`:''}</div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <div class="mv-badge mv-badge-xfer" style="width:36px;height:36px;font-size:12px;flex-shrink:0;">전실</div>
+          <div><div style="font-weight:700;color:#4527A0;">${r.xfer||0}명</div>
+            ${r.xferMemo?`<div style="font-size:12px;color:var(--muted);white-space:pre-wrap;">${esc(r.xferMemo)}</div>`:''}</div>
+        </div>
+      </div>
     </div>
     ${r.memo?`
     <div style="margin-top:10px;background:#FFFDE7;border:2px solid #F9A825;border-radius:8px;padding:13px;">
